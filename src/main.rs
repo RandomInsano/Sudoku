@@ -8,15 +8,15 @@ use std::iter::FromIterator;
 fn main() {
     let mut pf = Playfeild::new();
 
-    pf.set(0, 1, 3);
-    pf.set(3, 1, 6);
-    pf.set(0, 3, 5);
-    pf.set(1, 0, 4);
-
+    pf.set(1, 0, 6);
+    pf.set(2, 1, 7);
+    pf.fill_possible();
     pf.print();
     
     println!("Possible:");
-    for i in pf.find_possible(1, 1).iter() {
+    let mut possible = pf.find_possible(1, 1);
+    possible.sort();
+    for i in possible.iter() {
         print!("{},", i);
     }
     println!();
@@ -24,7 +24,7 @@ fn main() {
     println!("Hello, world!");
 }
 
-const P_WIDTH: usize = 10;
+const P_WIDTH: usize = 9;
 const P_HEIGHT: usize = 9;
 
 struct Playfeild {
@@ -43,24 +43,58 @@ impl Playfeild {
     }
 
     // Find the possible options for this tile
-    fn find_possible(self, x: usize, y: usize) -> Vec<u8> {
+    fn find_possible(&self, x: usize, y: usize) -> Vec<u8> {
         let mut possible: HashSet<u8> = HashSet::from_iter(1..10);
+
+        assert!(x < P_WIDTH);
+        assert!(y < P_HEIGHT);
 
         // Find all numbers in our current row
         for ix in 0 .. P_WIDTH {
-            if self.board[y][ix] != 0 {
-                possible.remove(&self.board[y][ix]);
+            let value = self.board[y][ix];
+            if value != 0 {
+                possible.remove(&value);
             }
         }
 
         // Find all numbers in our current column
         for iy in 0 .. P_HEIGHT {
-            if self.board[iy][x] != 0 {
-                possible.remove(&self.board[iy][x]);
+            let value = self.board[iy][x];
+            if value != 0 {
+                possible.remove(&value);
+            }
+        }
+
+        // Find all numbers in our quadrand
+        let qx = x / 3; // Mush X and Y down
+        let qy = y / 3; // So we're clamped to a section
+        for iy in qy * 3 .. (qy + 1) * 3 {
+            for ix in qx * 3 .. (qx + 1) * 3 {
+                let value = self.board[iy][ix];
+                if value != 0 {
+                    possible.remove(&value);
+                }
             }
         }
 
         Vec::<u8>::from_iter(possible.iter().cloned())
+    }
+
+    fn fill_possible(&mut self) {
+        for y in 0 .. P_HEIGHT {
+            for x in 0 .. P_WIDTH {
+                if self.board[y][x] == 0 {
+                    let mut possible = self.find_possible(x, y);
+                    possible.sort();
+
+                    if let Some(value) = possible.iter().next() {
+                        self.board[y][x] = *value;
+                    } else {
+                        
+                    }
+                }
+            }
+        }
     }
 
     /*
@@ -79,7 +113,11 @@ impl Playfeild {
         println!("\nPlayfield:");
         for col in self.board.into_iter() {
             for row in col.into_iter() {
-                print!(" {}", row);
+                if *row > 0 {
+                    print!(" {}", row);
+                } else {
+                    print!(" _");
+                }
             }
             println!();
         }
