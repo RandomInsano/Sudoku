@@ -1,27 +1,24 @@
 extern crate rand;
 
-//use rand::{thread_rng, Rng};
+use rand::{thread_rng, Rng};
 use std::collections::HashSet;
 use std::iter::FromIterator;
 
 
 fn main() {
     let mut pf = Playfeild::new();
+    let mut guesses: usize = 1; // Hoomans counts at one
 
     pf.set(1, 0, 6);
     pf.set(2, 1, 7);
-    pf.fill_possible();
-    pf.print();
-    
-    println!("Possible:");
-    let mut possible = pf.find_possible(1, 1);
-    possible.sort();
-    for i in possible.iter() {
-        print!("{},", i);
+    while (!pf.filled()) {
+        guesses += 1;
+        pf.reset();
+        pf.fill_possible();
     }
-    println!();
 
-    println!("Hello, world!");
+    pf.print();
+    println!("Found a result in {} guesses.", guesses);
 }
 
 const P_WIDTH: usize = 9;
@@ -29,12 +26,14 @@ const P_HEIGHT: usize = 9;
 
 struct Playfeild {
     board: [[u8; P_WIDTH]; P_HEIGHT],
+    random: Box<Rng>,
 }
 
 impl Playfeild {
     fn new() -> Playfeild {
         Playfeild {
             board: [[0u8; P_WIDTH]; P_HEIGHT],
+            random: Box::new(thread_rng()),
         }
     }
 
@@ -108,6 +107,28 @@ impl Playfeild {
         }
     }
     */
+
+    // TODO: Implement an iterator over the collection to
+    // save us from all these for loops
+    fn reset(&mut self) {
+        for y in 0 .. P_HEIGHT {
+            for x in 0 .. P_WIDTH {
+                self.board[y][x] = 0
+            }
+        }
+    }
+
+    fn filled(&self) -> bool {
+        for y in 0 .. P_HEIGHT {
+            for x in 0 .. P_WIDTH {
+                if self.board[y][x] == 0 {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
 
     fn print(&self) {
         println!("\nPlayfield:");
