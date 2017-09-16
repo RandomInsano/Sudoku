@@ -86,6 +86,9 @@ impl Playfeild {
                     let mut possible = self.find_possible(x, y);
                     possible.sort();
 
+                    // TODO: Purposely randomizing for now to brute-force solution
+                    self.random.shuffle(&mut possible);
+
                     if let Some(value) = possible.iter().next() {
                         self.board[y][x] = *value;
                     } else {
