@@ -9,11 +9,27 @@ fn main() {
     let mut pf = Playfeild::new();
     let mut guesses: usize = 1; // Hoomans counts at one
 
-    pf.set(1, 0, 6);
-    pf.set(2, 1, 7);
-    while (!pf.filled()) {
+    while !pf.filled() {
         guesses += 1;
         pf.reset();
+
+        pf.set(0, 0, 5);
+        pf.set(2, 0, 7);
+        pf.set(3, 0, 4);
+        pf.set(5, 0, 2);
+
+        pf.set(2, 1, 6);
+        pf.set(6, 1, 2);
+
+        pf.set(0, 2, 9);
+        pf.set(1, 2, 4);
+
+        pf.set(0, 3, 3);
+        pf.set(1, 3, 8);
+        pf.set(3, 3, 9);
+        pf.set(4, 3, 2);
+        pf.set(6, 3, 7);
+
         pf.fill_possible();
     }
 
