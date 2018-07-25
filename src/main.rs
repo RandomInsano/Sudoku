@@ -146,13 +146,13 @@ impl Playfeild {
             }
         }
 
-        return true;
+        true
     }
 
     fn print(&self) {
         println!("\nPlayfield:");
-        for col in self.board.into_iter() {
-            for row in col.into_iter() {
+        for col in &self.board {
+            for row in col {
                 if *row > 0 {
                     print!(" {}", row);
                 } else {
